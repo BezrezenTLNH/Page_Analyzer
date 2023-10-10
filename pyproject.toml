@@ -4,6 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["Mikhail Zherebtsov <bezrezen97@gmail.com>"]
 readme = "README.md"
+packages = [{include = "page_analyzer"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -11,6 +12,7 @@ flask = "^2.3.2"
 flake8 = "^5.0.4"
 pytest-cov = "^4.1.0"
 gunicorn = "^21.2.0"
+python-dotenv = "^1.0.0"
 
 [build-system]
 requires = ["poetry-core"]
