@@ -8,6 +8,6 @@ app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY')
 
 
-@app.get('/')
+@app.route('/')
 def root_get():
     return 'Hello!'
