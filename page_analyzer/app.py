@@ -1,6 +1,7 @@
 import os
 from flask import (Flask, render_template)
 from dotenv import load_dotenv
+import db_commands as db
 
 
 load_dotenv()
@@ -16,7 +17,8 @@ def root_get():
 
 @app.route('/urls', methods=['GET'])
 def check_url():
-    pass
+    urls = db.add_data()
+    return render_template('urls.html', urls=urls)
 
 
 @app.route('/urls', methods=['POST'])

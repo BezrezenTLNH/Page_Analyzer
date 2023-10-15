@@ -26,7 +26,6 @@ def get_id(url):
 
 
 def add_data(url):
-    # url = url_validate_and_normalize(url)
     if get_id(url):
         return None
     else:
@@ -47,25 +46,45 @@ def add_data(url):
             conn.close()
 
 
-def get_data(url):
+def get_all_data(url):
     try:
-        connection = psycopg2.connect(DATABASE_URL)
+        conn = psycopg2.connect(DATABASE_URL)
 
-        with connection.cursor() as cursor:
-            cursor.execute(
+        with conn.cursor() as cur:
+            cur.execute(
                 "SELECT * FROM urls"
             )
-            return cursor.fetchall()
+            return cur.fetchall()
 
     except psycopg2.Error:
         return None
 
     finally:
-        connection.close()
+        conn.close()
 
 
-# add_data('http://rutracker.org/1QQ2')
-print(get_data('http://rutracker.org/1QQ2'))
+def get_url_data(url):
+    try:
+        conn = psycopg2.connect(DATABASE_URL)
+        id = get_id(url)
+
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT * FROM urls WHERE id=%s",
+                (id)
+            )
+            return cur.fetchall()
+
+    except psycopg2.Error:
+        return None
+
+    finally:
+        conn.close()
+
+
+add_data('http://racker.org/1QQ2')
+print(get_all_data('http://rutracker.org/1QQ2'))
 print(get_id('http://rutracker.org/1QQ2'))
+print(get_url_data('http://racker.org/1QQ2'))
 # print(datetime.now())
 
