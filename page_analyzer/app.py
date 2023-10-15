@@ -1,7 +1,7 @@
 import os
 from flask import (Flask, render_template)
 from dotenv import load_dotenv
-import db_commands as db
+import page_analyzer.db_commands as db
 
 
 load_dotenv()
