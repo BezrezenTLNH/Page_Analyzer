@@ -47,7 +47,7 @@ def add_data(url):
             conn.close()
 
 
-def get_all_data(url):
+def get_all_data():
     try:
         conn = psycopg2.connect(DATABASE_URL)
 

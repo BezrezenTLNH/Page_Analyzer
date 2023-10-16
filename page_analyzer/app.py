@@ -16,7 +16,7 @@ def root_get():
 
 
 @app.route('/urls', methods=['GET'])
-def check_url():
+def urls():
     urls = db.add_data()
     return render_template('urls.html', urls=urls)
 
