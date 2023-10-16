@@ -51,20 +51,20 @@ def add_data(url):
 
 
 def get_all_data():
-    try:
-        conn = psycopg2.connect(DATABASE_URL)
-
+    with psycopg2.connect(DATABASE_URL) as conn:
         with conn.cursor() as cur:
             cur.execute(
                 "SELECT * FROM urls"
             )
-            return cur.fetchall()
+            rows = cur.fetchone()
 
-    except psycopg2.Error:
-        return None
+    urls = ({'id': row.id,
+             'name': row.name,
+             'created_at': row.created_at} for row in rows)
 
-    finally:
-        conn.close()
+    return urls
+
+
 
 
 def get_url_data(id):
