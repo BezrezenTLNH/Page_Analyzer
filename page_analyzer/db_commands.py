@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from urllib.parse import urlparse
 from validators import url as valid
 
+
 load_dotenv()
 DATABASE_URL = os.getenv('DATABASE_URL')
 
@@ -13,7 +14,6 @@ def url_validate_and_normalize(url):
     if len(url) < 255 and valid(url):
         url = urlparse(url)
         return f'{url.scheme}://{url.netloc}'
-
 
 
 def get_id(url):
@@ -81,11 +81,3 @@ def get_url_data(url):
 
     finally:
         conn.close()
-
-
-add_data('http://racker.org/1QQ2')
-print(get_all_data('http://rutracker.org/1QQ2'))
-print(get_id('http://rutracker.org/1QQ2'))
-print(get_url_data('http://racker.org/1QQ2'))
-# print(datetime.now())
-
