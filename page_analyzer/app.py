@@ -12,10 +12,10 @@ app.secret_key = os.getenv('SECRET_KEY')
 
 @app.route('/')
 def root_get():
-    return render_template('index.html')
+    return render_template('main.html')
 
 
-@app.route('/urls', methods=['GET'])
+@app.route('/urls')
 def urls():
     urls = db.get_all_data()
     return render_template('urls.html', urls=urls)
