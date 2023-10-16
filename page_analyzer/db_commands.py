@@ -10,10 +10,13 @@ load_dotenv()
 DATABASE_URL = os.getenv('DATABASE_URL')
 
 
-def url_validate_and_normalize(url):
+def url_normalize(url):
+    url = url = urlparse(url)
+    return f'{url.scheme}://{url.netloc}'
+
+def url_validate(url):
     if len(url) < 255 and valid(url):
-        url = urlparse(url)
-        return f'{url.scheme}://{url.netloc}'
+        return True
 
 
 def get_id(url):
@@ -64,20 +67,17 @@ def get_all_data():
         conn.close()
 
 
-def get_url_data(url):
-    try:
+def get_url_data(id):
         conn = psycopg2.connect(DATABASE_URL)
-        id = get_id(url)
 
         with conn.cursor() as cur:
             cur.execute(
                 "SELECT * FROM urls WHERE id=%s",
                 (id)
             )
-            return cur.fetchall()
+            row = cur.fetchone()
 
-    except psycopg2.Error:
-        return None
-
-    finally:
-        conn.close()
+        return {'id': row.id,
+                'name': row.name,
+                'created_at': row.created_at
+                }

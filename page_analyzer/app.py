@@ -1,5 +1,5 @@
 import os
-from flask import (Flask, render_template)
+from flask import (Flask, render_template, request, flash, get_flashed_messages, redirect, url_for)
 from dotenv import load_dotenv
 import page_analyzer.db_commands as db
 
@@ -21,11 +21,30 @@ def urls():
     return render_template('urls.html', urls=urls)
 
 
-# @app.route('/urls', methods=['POST'])
-# def create_urls():
-#     pass
+@app.route('/urls', methods=['POST'])
+def create_urls():
+    input = request.form.to_dict()
+    url = input['url']
+
+    if not db.url_valide(url):
+        flash('Некорректный URL', 'alert-danger')
+        msgs = get_flashed_messages(with_categories=True)
+        return render_template('index.html', url=url, msgs=msgs), 422
+
+    url = db.url_normalize(url)
+
+    id = db.add_data(url)
+    if id is None:
+        flash('Something wrong', 'alert-danger')
+        msgs = get_flashed_messages(with_categories=True)
+        return render_template('index.html', url=url, msgs=msgs), 422
+
+    flash('Страница успешно добавлена', 'alert-success')
+    return redirect(url_for('url_get', id=id))
 
 
-@app.route('/urls/<id>', methods=['GET'])
-def check_url_id(id):
-    pass
+@app.route('/urls/<int:id>', methods=['GET'])
+def get_url(id):
+    url = db.get_url_data(id)
+    msgs = get_flashed_messages(with_categories=True)
+    return render_template('url_get.html', url=url, msgs=msgs)
