@@ -40,8 +40,17 @@
       <th>Код ответа</th>
     </tr>
     </thead>
-    <tbody>
-
+     <tbody>
+            {% for url in urls %}
+            <tr>
+                <td>{{ url.id }}</td>
+                <td>
+                    <a href="/urls/{{ url.id }}">{{ url.name }}</a>
+                </td>
+                <td>{{ url.date }}</td>
+                <td>{{ url.status }}</td>
+            </tr>
+            {% endfor %}
     </tbody>
   </table>
 </div>
