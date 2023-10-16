@@ -17,13 +17,13 @@ def root_get():
 
 @app.route('/urls', methods=['GET'])
 def urls():
-    urls = db.add_data()
+    urls = db.get_all_data()
     return render_template('urls.html', urls=urls)
 
 
-@app.route('/urls', methods=['POST'])
-def create_urls():
-    pass
+# @app.route('/urls', methods=['POST'])
+# def create_urls():
+#     pass
 
 
 @app.route('/urls/<id>', methods=['GET'])
