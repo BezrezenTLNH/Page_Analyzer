@@ -23,24 +23,34 @@ def urls():
 
 @app.route('/urls', methods=['POST'])
 def create_urls():
-    input = request.form.to_dict()
-    url = input['url']
+    url = request.form.get('url')
+
+    if not url:
+        flash('URL обязателен', 'danger')
+        messages = get_flashed_messages(with_categories=True)
+        return render_template('main.html', messages=messages), 422
 
     if not db.url_valide(url):
-        flash('Некорректный URL', 'alert-danger')
-        msgs = get_flashed_messages(with_categories=True)
-        return render_template('index.html', url=url, msgs=msgs), 422
+        flash('Некорректный URL', 'danger')
+        messages = get_flashed_messages(with_categories=True)
+        return render_template('main.html', messages=messages), 422
 
     url = db.url_normalize(url)
 
+    if db.get_id(url):
+        id = db.get_id(url)
+        flash('Страница уже существует', 'alert-info')
+        return redirect(url_for('url_get', id=id))
+
     id = db.add_data(url)
+
     if id is None:
         flash('Something wrong', 'alert-danger')
         msgs = get_flashed_messages(with_categories=True)
         return render_template('index.html', url=url, msgs=msgs), 422
 
     flash('Страница успешно добавлена', 'alert-success')
-    return redirect(url_for('url_get', id=id))
+    return redirect(url_for('get_site', id=id), code=302)
 
 
 @app.route('/urls/<int:id>', methods=['GET'])

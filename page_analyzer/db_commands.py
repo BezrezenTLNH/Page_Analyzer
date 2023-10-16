@@ -40,7 +40,10 @@ def add_data(url):
                                 'VALUES (%s, %s) RETURNING id',
                                 (url, datetime.now())
                                 )
+                    conn.commit()
+
                     id = cur.fetchone()
+
                     return id
 
         except psycopg2.Error:
