@@ -37,12 +37,12 @@ def urls_post():
         msgs = get_flashed_messages(with_categories=True)
         return render_template('main.html', msgs=msgs), 422
 
-    id = db.add_data(url)
-
     if db.get_id(url):
         id = db.get_id(url)
         flash('Страница уже существует', 'info')
         return redirect(url_for('url_get', id=id), code=302)
+
+    id = db.add_data(url)
 
     flash('Страница успешно добавлена', 'success')
     return redirect(url_for('url_get', id=id), code=302)
@@ -52,5 +52,17 @@ def urls_post():
 def url_get(id):
     msgs = get_flashed_messages(with_categories=True)
     url = db.get_url_data(id)
+    checks = db.check_url(id)
 
-    return render_template('url.html', url=url, msgs=msgs), 422
+    return render_template('url.html', url=url, checks=checks, msgs=msgs), 422
+
+@app.route('/urls/<int:id>/checks', methods=['POST'])
+def run_check(id):
+    checks = db.get_check_url(id)
+    if not checks:
+        flash('Произошла ошибка при проверке', 'danger')
+        return redirect(url_for('url_get', id=id), code=302)
+
+    flash('Страница успешно проверена', 'succes')
+
+    return redirect(url_for('url_get', id=id), code=302)
