@@ -1,6 +1,7 @@
 import os
 import psycopg2
 import psycopg2.extras
+import requests
 from datetime import date
 from dotenv import load_dotenv
 from urllib.parse import urlparse
@@ -14,6 +15,7 @@ DATABASE_URL = os.getenv('DATABASE_URL')
 def url_normalize(url):
     url = urlparse(url)
     return f'{url.scheme}://{url.netloc}'
+
 
 def url_validate(url):
     if len(url) < 255 and valid(url):
@@ -62,21 +64,31 @@ def get_data():
     with psycopg2.connect(DATABASE_URL) as conn:
         with conn.cursor(
                 cursor_factory=psycopg2.extras.DictCursor) as cur:
-            cur.execute('SELECT * FROM urls ORDER BY id DESC')
+            cur.execute('''SELECT DISTINCT ON (urls.id) urls.id, name,
+            url_checks.created_at, url_checks.status_code
+            FROM urls
+            LEFT JOIN url_checks ON urls.id = url_checks.url_id
+            ORDER BY urls.id DESC, url_checks.id DESC;''')
 
             return cur.fetchall()
 
+
 def check_url(id):
+    url = get_url_data(id)[1]
+    r = requests.get(url)
+    status_code = r.status_code
     with psycopg2.connect(DATABASE_URL) as conn:
         with conn.cursor(
                 cursor_factory=psycopg2.extras.DictCursor) as cur:
-            cur.execute('INSERT INTO url_checks (url_id, created_at)'
-                        'VALUES (%s, %s)',
-                        (id, date.today().isoformat())
+            cur.execute('INSERT INTO url_checks (url_id, '
+                        'created_at, status_code)'
+                        'VALUES (%s, %s, %s)',
+                        (id, date.today().isoformat(), status_code)
                         )
             conn.commit()
 
             return get_check_url(id)
+
 
 def get_check_url(id):
     with psycopg2.connect(DATABASE_URL) as conn:
@@ -86,17 +98,3 @@ def get_check_url(id):
 
             return cursor.fetchall()
 
-#  Реализуйте обработчик маршрута POST urls/<id>/checks и форму с кнопкой на странице сайта,
-#  при отправке которой происходит создание новой проверки.
-#  Обратите внимание, что на этом шаге заполняются только базовые поля
-#  (url_id и created_at)
-
-#  1) Найти способ создавать записи в sql на основе другого уникального
-#  id (связанные таблицы?)
-
-#  2) Использовать псикорг2 для покключения к дб, написать запрос.
-#  заполнить колонки
-
-#  3) Проверить работоспособность
-
-#  4) Написать тесты

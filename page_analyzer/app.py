@@ -1,5 +1,7 @@
 import os
-from flask import (Flask, render_template, request, flash, get_flashed_messages, redirect, url_for)
+from flask import (Flask, render_template,
+                   request, flash, get_flashed_messages,
+                   redirect, url_for)
 from dotenv import load_dotenv
 import page_analyzer.db_commands as db
 
@@ -54,7 +56,9 @@ def url_get(id):
     url = db.get_url_data(id)
     checks = db.check_url(id)
 
-    return render_template('url.html', url=url, checks=checks, msgs=msgs), 422
+    return render_template('url.html',
+                           url=url, checks=checks, msgs=msgs), 422
+
 
 @app.route('/urls/<int:id>/checks', methods=['POST'])
 def run_check(id):
