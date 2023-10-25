@@ -95,8 +95,6 @@ def check_url(id):
                           date.today().isoformat())))
             conn.commit()
 
-            return get_check_url(id)
-
 
 def get_check_url(id):
     with psycopg2.connect(DATABASE_URL) as conn:
@@ -105,4 +103,3 @@ def get_check_url(id):
             cursor.execute("SELECT * FROM url_checks WHERE url_id=%s", (id,))
 
             return cursor.fetchall()
-

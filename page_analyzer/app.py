@@ -7,8 +7,8 @@ import page_analyzer.db_commands as db
 
 
 load_dotenv()
-DATABASE_URL = os.getenv('DATABASE_URL')
 app = Flask(__name__)
+DATABASE_URL = os.getenv('DATABASE_URL')
 app.secret_key = os.getenv('SECRET_KEY')
 
 
