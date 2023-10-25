@@ -2,6 +2,7 @@ import os
 import psycopg2
 import psycopg2.extras
 import requests
+from bs4 import BeautifulSoup
 from datetime import date
 from dotenv import load_dotenv
 from urllib.parse import urlparse
@@ -77,14 +78,21 @@ def check_url(id):
     url = get_url_data(id)[1]
     r = requests.get(url)
     status_code = r.status_code
+    soup = BeautifulSoup(r.text, 'html.parser')
+    title = soup.select_one('title')
+    h1 = soup.select_one('h1')
+    description = soup.select_one('meta[name="description"]')
     with psycopg2.connect(DATABASE_URL) as conn:
         with conn.cursor(
                 cursor_factory=psycopg2.extras.DictCursor) as cur:
-            cur.execute('INSERT INTO url_checks (url_id, '
-                        'created_at, status_code)'
-                        'VALUES (%s, %s, %s)',
-                        (id, date.today().isoformat(), status_code)
-                        )
+            cur.execute('INSERT INTO url_checks (url_id, status_code, '
+                        'h1, title, description, created_at)'
+                        'VALUES (%s, %s, %s, %s, %s, %s)',
+                        ((id, status_code,
+                          h1.string if h1 else None,
+                          title.string if title else None,
+                          description['content'] if description else None,
+                          date.today().isoformat())))
             conn.commit()
 
             return get_check_url(id)
