@@ -10,7 +10,7 @@ import page_analyzer
 
 
 load_dotenv()
-URL = 'http://localhost:8000/'
+URL = 'https://page-analyzer-zx8t.onrender.com/'
 DATABASE_URL = os.getenv('DATABASE_URL')
 
 
