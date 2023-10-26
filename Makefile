@@ -21,7 +21,7 @@ test:
 	poetry run pytest
 
 lint:
-	poetry run flake8 page_analyzer tests
+	poetry run flake8 page_analyzer
 
 check: selfcheck test lint
 
