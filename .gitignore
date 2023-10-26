@@ -2,3 +2,5 @@ __pycache__
 .env
 .coverage
 coverage.xml
+.venv/
+dist/
