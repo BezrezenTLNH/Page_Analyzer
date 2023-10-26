@@ -44,7 +44,8 @@ def urls_post():
         flash('Страница уже существует', 'info')
         return redirect(url_for('url_get', id=id), code=302)
 
-    id = db.add_data(url)
+    db.add_data(url)
+    id = db.get_id(url)
 
     flash('Страница успешно добавлена', 'success')
     return redirect(url_for('url_get', id=id), code=302)
@@ -54,7 +55,7 @@ def urls_post():
 def url_get(id):
     msgs = get_flashed_messages(with_categories=True)
     url = db.get_url_data(id)
-    checks = db.check_url(id)
+    checks = db.get_check_url(id)
 
     return render_template('url.html',
                            url=url, checks=checks, msgs=msgs), 422

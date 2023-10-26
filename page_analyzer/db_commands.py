@@ -56,10 +56,6 @@ def add_data(url):
                         )
             conn.commit()
 
-            id = get_id(url)
-
-            return id
-
 
 def get_data():
     with psycopg2.connect(DATABASE_URL) as conn:
