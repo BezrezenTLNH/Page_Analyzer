@@ -13,3 +13,17 @@ lint:
 
 build:
 	./build.sh
+
+selfcheck:
+	poetry check
+
+test:
+	poetry run pytest
+
+lint:
+	poetry run flake8 page_analyzer tests
+
+check: selfcheck test lint
+
+test-coverage:
+	poetry run pytest --cov=page_analyzer tests/ --cov-report xml tests

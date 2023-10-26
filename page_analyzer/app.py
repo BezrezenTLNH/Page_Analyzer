@@ -1,4 +1,5 @@
 import os
+import requests
 from flask import (Flask, render_template,
                    request, flash, get_flashed_messages,
                    redirect, url_for)
@@ -63,11 +64,16 @@ def url_get(id):
 
 @app.route('/urls/<int:id>/checks', methods=['POST'])
 def run_check(id):
-    checks = db.get_check_url(id)
-    if not checks:
-        flash('Произошла ошибка при проверке', 'danger')
-        return redirect(url_for('url_get', id=id), code=302)
+    url = db.get_url_data(id)['name']
+    try:
+        status_code, title, h1, description = db.parser(url)
 
-    flash('Страница успешно проверена', 'succes')
+    except requests.exceptions.RequestException:
+        flash('Произошла ошибка при проверке', 'danger')
+
+    else:
+        db.check_url(id, status_code, title, h1, description)
+        flash('Страница успешно проверена', 'success')
+        return redirect(url_for('url_get', id=id), code=302)
 
     return redirect(url_for('url_get', id=id), code=302)

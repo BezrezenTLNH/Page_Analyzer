@@ -15,7 +15,7 @@ DATABASE_URL = os.getenv('DATABASE_URL')
 
 def url_normalize(url):
     url = urlparse(url)
-    return f'{url.scheme}://{url.netloc}'
+    return f'{url.scheme.lower()}://{url.netloc.lower()}'
 
 
 def url_validate(url):
@@ -70,14 +70,7 @@ def get_data():
             return cur.fetchall()
 
 
-def check_url(id):
-    url = get_url_data(id)[1]
-    r = requests.get(url)
-    status_code = r.status_code
-    soup = BeautifulSoup(r.text, 'html.parser')
-    title = soup.select_one('title')
-    h1 = soup.select_one('h1')
-    description = soup.select_one('meta[name="description"]')
+def check_url(id, status_code, title, h1, description):
     with psycopg2.connect(DATABASE_URL) as conn:
         with conn.cursor(
                 cursor_factory=psycopg2.extras.DictCursor) as cur:
@@ -99,3 +92,21 @@ def get_check_url(id):
             cursor.execute("SELECT * FROM url_checks WHERE url_id=%s", (id,))
 
             return cursor.fetchall()
+
+
+def parser(url):
+    try:
+        r = requests.get(url)
+        r.raise_for_status()
+
+    except requests.exceptions.RequestException:
+        raise requests.exceptions.RequestException
+
+    else:
+        status_code = r.status_code
+        soup = BeautifulSoup(r.text, 'html.parser')
+        title = soup.select_one('title')
+        h1 = soup.select_one('h1')
+        description = soup.select_one('meta[name="description"]')
+
+    return status_code, h1, title, description
