@@ -70,7 +70,7 @@ def get_data():
             return cur.fetchall()
 
 
-def check_url(id, status_code, title, h1, description):
+def check_url(id, status_code, h1, title, description):
     with psycopg2.connect(DATABASE_URL) as conn:
         with conn.cursor(
                 cursor_factory=psycopg2.extras.DictCursor) as cur:
