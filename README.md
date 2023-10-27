@@ -7,7 +7,7 @@
 
 ## Description
 
-This is a web service for checking metadata from sites using databases
+This is a web service for checking metadata from sites using databases.
 
 ## Requirements:
 * python ^3.8.1
