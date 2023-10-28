@@ -35,7 +35,7 @@ def test_get_root(client):
 
 
 def test_check_url(page: Page):
-    page.goto(f'{URL}/')
+    page.goto(f'{URL}/', timeout=0)
     page.get_by_placeholder("https://www.example.com"). \
         fill("")
     page.locator('input[type="submit"]').click()
@@ -46,13 +46,13 @@ def test_check_url(page: Page):
     page.locator('input[type="submit"]').click()
     expect(page.get_by_text("Некорректный URL")).to_be_visible()
 
-    page.goto(f'{URL}/')
+    page.goto(f'{URL}/', timeout=0)
     page.get_by_placeholder("https://www.example.com"). \
         fill("https://test.com")
     page.locator('input[type="submit"]').click()
     expect(page.get_by_text("Страница успешно добавлена")).to_be_visible()
 
-    page.goto(f'{URL}/')
+    page.goto(f'{URL}/', timeout=0)
     page.get_by_placeholder("https://www.example.com"). \
         fill("https://TEST.com")
     page.locator('input[type="submit"]').click()
@@ -67,7 +67,7 @@ def test_check_url(page: Page):
 
 
 def test_urls_get(page: Page):
-    page.goto(f'{URL}/urls')
+    page.goto(f'{URL}/urls', timeout=0)
     expect(page.get_by_role("heading", name="Сайты")).to_be_visible()
     expect(page.get_by_role("table", name='')).to_be_visible()
 
