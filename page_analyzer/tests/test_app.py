@@ -29,7 +29,7 @@ def client(app):
     return app.test_client()
 
 
-def test_get_main_page(client):
+def test_get_root(client):
     response = client.get('/')
     assert response.status_code == 200
 
@@ -66,21 +66,21 @@ def test_check_url(page: Page):
             conn.commit()
 
 
-def test_get_urls(page: Page):
+def test_urls_get(page: Page):
     page.goto(f'{URL}/urls')
     expect(page.get_by_role("heading", name="Сайты")).to_be_visible()
     expect(page.get_by_role("table", name='')).to_be_visible()
 
 
 def test_run_check(page: Page):
-    page.goto(f'{URL}/')
+    page.goto(f'{URL}/', timeout=0)
     page.get_by_placeholder("https://www.example.com"). \
         fill("https://aaa.ru")
     page.locator('input[type="submit"]').click()
     page.locator('text=Запустить проверку').click()
     expect(page.get_by_text("Страница успешно проверена")).to_be_visible()
 
-    page.goto(f'{URL}/')
+    page.goto(f'{URL}/', timeout=0)
     page.get_by_placeholder("https://www.example.com"). \
         fill("https://ccc.com")
     page.locator('input[type="submit"]').click()
