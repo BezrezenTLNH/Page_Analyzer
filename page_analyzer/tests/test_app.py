@@ -1,7 +1,7 @@
 import os
 
-import psycopg2
-import psycopg2.extras
+# import psycopg2
+# import psycopg2.extras
 import pytest
 from dotenv import load_dotenv
 from playwright.sync_api import Page, expect
