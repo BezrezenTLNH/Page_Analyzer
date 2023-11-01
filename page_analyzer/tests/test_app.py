@@ -39,6 +39,7 @@ def test_add_data():
 
 
 def test_check_url():
+    pa.add_data(TESTING_URL)
     id = pa.get_id(TESTING_URL)
     status_code, h1, title, description = pa.parser(TESTING_URL)
     pa.check_url(id, status_code, h1, title, description)
