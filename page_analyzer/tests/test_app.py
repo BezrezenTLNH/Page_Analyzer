@@ -1,6 +1,9 @@
 import os
 
-import page_analyzer.db_commands as pa
+from page_analyzer.db_commands import (add_data,
+                                       get_id, get_url_data,
+                                       check_url, get_check_url)
+from page_analyzer.url_parse import url_parse
 import pytest
 from dotenv import load_dotenv
 import page_analyzer
@@ -33,18 +36,19 @@ def test_get_root(client):
 
 
 def test_add_data():
-    pa.add_data(TESTING_URL)
-    id = pa.get_id(TESTING_URL)
-    assert pa.get_url_data(id)['name'] == 'https://career.habr.com'
+    add_data(TESTING_URL)
+    id = get_id(TESTING_URL)
+    assert get_url_data(id)['name'] == 'https://career.habr.com'
 
 
 def test_check_url():
-    pa.add_data(TESTING_URL)
-    id = pa.get_id(TESTING_URL)
-    status_code, h1, title, description = pa.parser(TESTING_URL)
-    pa.check_url(id, status_code, h1, title, description)
-    assert pa.get_check_url(id)[0]['id'] == 1
-    assert pa.get_check_url(id)[0]['status_code'] == 200
-    assert pa.get_check_url(id)[0]['title'] == \
+    add_data(TESTING_URL)
+    id = get_id(TESTING_URL)
+    status_code, h1, title, description = url_parse(TESTING_URL)
+    check_url(id, status_code, h1, title, description)
+    result = get_check_url(id)[0]
+    assert result['id'] == 1
+    assert result['status_code'] == 200
+    assert result['title'] == \
            'Работа в IT-индустрии, свежие вакансии и резюме,' \
            ' поиск работы — Хабр Карьера'

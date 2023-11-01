@@ -4,7 +4,9 @@ from flask import (Flask, render_template,
                    request, flash, get_flashed_messages,
                    redirect, url_for)
 from dotenv import load_dotenv
+from page_analyzer.url_parse import url_parse
 import page_analyzer.db_commands as db
+import page_analyzer.url_validation as uv
 
 
 load_dotenv()
@@ -33,9 +35,9 @@ def urls_post():
         msgs = get_flashed_messages(with_categories=True)
         return render_template('main.html', msgs=msgs), 422
 
-    url = db.url_normalize(url)
+    url = uv.url_normalize(url)
 
-    if not db.url_validate(url):
+    if not uv.url_validate(url):
         flash('Некорректный URL', 'danger')
         msgs = get_flashed_messages(with_categories=True)
         return render_template('main.html', msgs=msgs), 422
@@ -43,13 +45,13 @@ def urls_post():
     if db.get_id(url):
         id = db.get_id(url)
         flash('Страница уже существует', 'info')
-        return redirect(url_for('url_get', id=id), code=302)
+        return redirect(url_for('url_get', id=id))
 
     db.add_data(url)
     id = db.get_id(url)
 
     flash('Страница успешно добавлена', 'success')
-    return redirect(url_for('url_get', id=id), code=302)
+    return redirect(url_for('url_get', id=id))
 
 
 @app.route('/urls/<int:id>')
@@ -59,14 +61,14 @@ def url_get(id):
     checks = db.get_check_url(id)
 
     return render_template('url.html',
-                           url=url, checks=checks, msgs=msgs), 422
+                           url=url, checks=checks, msgs=msgs)
 
 
 @app.route('/urls/<int:id>/checks', methods=['POST'])
 def run_check(id):
     url = db.get_url_data(id)['name']
     try:
-        status_code, title, h1, description = db.parser(url)
+        status_code, title, h1, description = url_parse(url)
 
     except requests.exceptions.RequestException:
         flash('Произошла ошибка при проверке', 'danger')
@@ -74,6 +76,6 @@ def run_check(id):
     else:
         db.check_url(id, status_code, title, h1, description)
         flash('Страница успешно проверена', 'success')
-        return redirect(url_for('url_get', id=id), code=302)
+        return redirect(url_for('url_get', id=id))
 
-    return redirect(url_for('url_get', id=id), code=302)
+    return redirect(url_for('url_get', id=id))

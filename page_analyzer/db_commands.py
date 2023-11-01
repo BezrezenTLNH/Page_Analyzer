@@ -1,26 +1,12 @@
 import os
 import psycopg2
 import psycopg2.extras
-import requests
-from bs4 import BeautifulSoup
 from datetime import date
 from dotenv import load_dotenv
-from urllib.parse import urlparse
-from validators import url as valid
 
 
 load_dotenv()
 DATABASE_URL = os.getenv('DATABASE_URL')
-
-
-def url_normalize(url):
-    url = urlparse(url)
-    return f'{url.scheme.lower()}://{url.netloc.lower()}'
-
-
-def url_validate(url):
-    if len(url) < 255 and valid(url):
-        return True
 
 
 def get_id(url):
@@ -92,21 +78,3 @@ def get_check_url(id):
             cursor.execute("SELECT * FROM url_checks WHERE url_id=%s", (id,))
 
             return cursor.fetchall()
-
-
-def parser(url):
-    try:
-        r = requests.get(url)
-        r.raise_for_status()
-
-    except requests.exceptions.RequestException:
-        raise requests.exceptions.RequestException
-
-    else:
-        status_code = r.status_code
-        soup = BeautifulSoup(r.text, 'html.parser')
-        title = soup.select_one('title')
-        h1 = soup.select_one('h1')
-        description = soup.select_one('meta[name="description"]')
-
-    return status_code, h1, title, description
