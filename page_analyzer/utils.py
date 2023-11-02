@@ -18,18 +18,16 @@ def url_parse(url):
 
     page_data = {}
 
-    try:
-        r = requests.get(url)
-        r.raise_for_status()
+    r = requests.get(url)
+    r.raise_for_status()
 
-    except requests.exceptions.RequestException:
+    page_data['status_code'] = r.status_code
+    soup = BeautifulSoup(r.text, 'html.parser')
+    page_data['title'] = soup.select_one('title')
+    page_data['h1'] = soup.select_one('h1')
+    page_data['description'] = soup.select_one('meta[name="description"]')
+
+    if page_data['status_code'] != 200:
         raise requests.exceptions.RequestException
-
-    else:
-        page_data['status_code'] = r.status_code
-        soup = BeautifulSoup(r.text, 'html.parser')
-        page_data['title'] = soup.select_one('title')
-        page_data['h1'] = soup.select_one('h1')
-        page_data['description'] = soup.select_one('meta[name="description"]')
 
     return page_data
