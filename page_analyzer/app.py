@@ -4,9 +4,9 @@ from flask import (Flask, render_template,
                    request, flash, get_flashed_messages,
                    redirect, url_for)
 from dotenv import load_dotenv
-from page_analyzer.url_parse import url_parse
 import page_analyzer.db_commands as db
-import page_analyzer.url_validation as uv
+from page_analyzer.utils import (url_normalize,
+                                 url_parse, url_validate)
 
 
 load_dotenv()
@@ -22,12 +22,15 @@ def root_get():
 
 @app.route('/urls')
 def urls_get():
-    urls = db.get_data()
+    conn = db.make_connection()
+    urls = db.get_all_urls_and_checks(conn)
+    db.close_connection(conn)
     return render_template('urls.html', urls=urls)
 
 
 @app.route('/urls', methods=['POST'])
 def urls_post():
+    conn = db.make_connection()
     url = request.form.get('url')
 
     if not url:
@@ -35,30 +38,30 @@ def urls_post():
         msgs = get_flashed_messages(with_categories=True)
         return render_template('main.html', msgs=msgs), 422
 
-    url = uv.url_normalize(url)
+    url = url_normalize(url)
 
-    if not uv.url_validate(url):
+    if not url_validate(url):
         flash('Некорректный URL', 'danger')
         msgs = get_flashed_messages(with_categories=True)
         return render_template('main.html', msgs=msgs), 422
 
-    if db.get_id(url):
-        id = db.get_id(url)
+    if id := db.get_id(url, conn):
         flash('Страница уже существует', 'info')
         return redirect(url_for('url_get', id=id))
 
-    db.add_data(url)
-    id = db.get_id(url)
-
+    id = db.add_data(url, conn)
+    db.close_connection(conn)
     flash('Страница успешно добавлена', 'success')
     return redirect(url_for('url_get', id=id))
 
 
 @app.route('/urls/<int:id>')
 def url_get(id):
+    conn = db.make_connection()
     msgs = get_flashed_messages(with_categories=True)
-    url = db.get_url_data(id)
-    checks = db.get_check_url(id)
+    url = db.get_url_data(id, conn)
+    checks = db.get_check_url(id, conn)
+    db.close_connection(conn)
 
     return render_template('url.html',
                            url=url, checks=checks, msgs=msgs)
@@ -66,16 +69,17 @@ def url_get(id):
 
 @app.route('/urls/<int:id>/checks', methods=['POST'])
 def run_check(id):
-    url = db.get_url_data(id)['name']
+    conn = db.make_connection()
+    url = db.get_url_data(id, conn)['name']
     try:
-        status_code, title, h1, description = url_parse(url)
+        page_data = url_parse(url)
 
     except requests.exceptions.RequestException:
         flash('Произошла ошибка при проверке', 'danger')
 
     else:
-        db.check_url(id, status_code, title, h1, description)
+        db.check_url(id, page_data, conn)
         flash('Страница успешно проверена', 'success')
         return redirect(url_for('url_get', id=id))
-
+    db.close_connection(conn)
     return redirect(url_for('url_get', id=id))
