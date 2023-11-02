@@ -50,4 +50,4 @@ def test_check_url():
     assert result['id'] == 1
     assert result['status_code'] == 200
     assert result['title'] == \
-           "DeepL Translate: The world's most accurate translator"
+           "Django documentation | Django documentation | Django"
