@@ -22,7 +22,7 @@ def root_get():
 
 @app.route('/urls')
 def urls_get():
-    conn = db.make_connection()
+    conn = db.get_connection()
     urls = db.get_all_urls_and_checks(conn)
     db.close_connection(conn)
     return render_template('urls.html', urls=urls)
@@ -30,7 +30,7 @@ def urls_get():
 
 @app.route('/urls', methods=['POST'])
 def urls_post():
-    conn = db.make_connection()
+    conn = db.get_connection()
     url = request.form.get('url')
 
     if not url:
@@ -57,19 +57,19 @@ def urls_post():
 
 @app.route('/urls/<int:id>')
 def url_get(id):
-    conn = db.make_connection()
+    conn = db.get_connection()
     msgs = get_flashed_messages(with_categories=True)
     url = db.get_url_data(id, conn)
     checks = db.get_check_url(id, conn)
     db.close_connection(conn)
 
-    return render_template('url.html',
+    return render_template('url_details.html',
                            url=url, checks=checks, msgs=msgs)
 
 
 @app.route('/urls/<int:id>/checks', methods=['POST'])
 def run_check(id):
-    conn = db.make_connection()
+    conn = db.get_connection()
     url = db.get_url_data(id, conn)['name']
     try:
         page_data = url_parse(url)

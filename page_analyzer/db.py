@@ -9,7 +9,7 @@ load_dotenv()
 DATABASE_URL = os.getenv('DATABASE_URL')
 
 
-def make_connection():
+def get_connection():
     return psycopg2.connect(DATABASE_URL)
 
 
