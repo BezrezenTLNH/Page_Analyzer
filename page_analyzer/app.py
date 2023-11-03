@@ -4,7 +4,7 @@ from flask import (Flask, render_template,
                    request, flash, get_flashed_messages,
                    redirect, url_for)
 from dotenv import load_dotenv
-import page_analyzer.db_commands as db
+import page_analyzer.db as db
 from page_analyzer.utils import (url_normalize,
                                  url_parse, url_validate)
 
