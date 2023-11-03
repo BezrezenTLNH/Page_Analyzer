@@ -1,8 +1,8 @@
 import os
 
-from page_analyzer.db import (add_data, get_url_data,
-                                       check_url, get_check_url,
-                                       get_connection)
+from page_analyzer.db import (
+    add_data, get_url_data, check_url, get_check_url, get_connection
+)
 from page_analyzer.utils import url_parse
 import pytest
 from dotenv import load_dotenv
